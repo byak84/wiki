@@ -30,4 +30,10 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     @JsonIgnoreProperties("user")
     private List<Msg> messages;
+
+    public boolean isValid() {
+        if ((this.login.equals("")) || (this.password.equals("")) ) return false;
+        else return true;
+    }
+
 }

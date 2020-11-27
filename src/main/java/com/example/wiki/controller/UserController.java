@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:8080")
@@ -49,12 +48,15 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody User user) {
-        try {
-            userService.addUser(user);
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (user.isValid()) {
+            try {
+                userService.addUser(user);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return new ResponseEntity<>(user, HttpStatus.OK);
         }
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        else return new ResponseEntity<>(user, HttpStatus.BAD_REQUEST);
     }
 
 }

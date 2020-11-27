@@ -3,7 +3,6 @@ package com.example.wiki.service;
 import com.example.wiki.dao.UserRepo;
 import com.example.wiki.entity.Role;
 import com.example.wiki.entity.User;
-import com.sun.javaws.IconUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,7 +16,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Service
-//@Primary
 public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
@@ -35,7 +33,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         for (Role role : user.getRoles()) {
             grantedAuthorities.add(new SimpleGrantedAuthority(role.getName()));
         }
-        System.out.println("hello");
         return new org.springframework.security.core.userdetails.User(user.getLogin(), user.getPassword(), grantedAuthorities);
     }
 }

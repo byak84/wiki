@@ -6,6 +6,7 @@ import com.example.wiki.entity.Role;
 import com.example.wiki.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -15,16 +16,22 @@ import java.util.Optional;
 @Service
 public class UserService {
 
-    UserRepo userRepo;
+    private UserRepo userRepo;
     @Autowired
     public void setUserRepo(UserRepo userRepo) {
         this.userRepo = userRepo;
     }
 
-    RoleRepo roleRepo;
+    private RoleRepo roleRepo;
     @Autowired
     public void setRoleRepo(RoleRepo roleRepo) {
         this.roleRepo = roleRepo;
+    }
+
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
     }
 
     //------------------------
@@ -64,6 +71,7 @@ public class UserService {
             List<Role> roles = new ArrayList<Role>();
             roles.add(roleRepo.findByName("ROLE_USER"));
             user.setRoles(roles);
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
             userRepo.save(user);
             return user;
         } else throw new Exception("User is empty");
@@ -72,7 +80,7 @@ public class UserService {
     public User findByLoginAndPassword(String login, String password) {
         User user = findByLogin(login);
         if (user != null) {
-            if (password.equals(user.getPassword())) {
+            if (passwordEncoder.matches(password, user.getPassword())) {
                 return user;
             }
         }
