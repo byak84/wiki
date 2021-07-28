@@ -69,4 +69,15 @@ public class UserController {
         }
     }
 
+    @GetMapping("/activate/{uuid}")
+    public ResponseEntity<?> activate(@PathVariable String uuid) {
+        try {
+            User user = userService.getByUUID(uuid);
+            userService.activate(user);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ErrorResponse(Collections.singletonList(e.getLocalizedMessage())), HttpStatus.BAD_REQUEST);
+        }
+    }
+
 }

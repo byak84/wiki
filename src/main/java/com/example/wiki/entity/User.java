@@ -43,7 +43,7 @@ public class User {
     private boolean active;
 
     @JsonView({Serialize.UserView.class})
-    private String uuid_link;
+    private String uuid;
 
 
     @JsonView({Serialize.UserView.class})
@@ -60,8 +60,8 @@ public class User {
     private List<Post> postList;
 
     public User() {
-        this.active = true;
-        this.uuid_link = UUID.randomUUID().toString();
+        this.active = false;
+        this.uuid = UUID.randomUUID().toString();
     }
 
     @Override
