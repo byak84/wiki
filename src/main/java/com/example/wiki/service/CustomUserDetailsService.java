@@ -22,17 +22,19 @@ public class CustomUserDetailsService implements UserDetailsService {
     UserRepo userRepo;
 
     @Override
-    @Transactional(readOnly = true)
+//    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        User user = userRepo.findByLogin(s);
+        User user = userRepo.findByUsername(s);
         if (user == null) {
-            throw new UsernameNotFoundException("Bad login");
+            throw new UsernameNotFoundException("Bad auth data");
         }
-        Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
 
-        for (Role role : user.getRoles()) {
-            grantedAuthorities.add(new SimpleGrantedAuthority(role.getName()));
-        }
-        return new org.springframework.security.core.userdetails.User(user.getLogin(), user.getPassword(), grantedAuthorities);
+        UserDetails userDetails = new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), user.isActive(), true, true, true, user.getRoles());
+
+
+//        userDetails.getAuthorities().addAll(user.getRoles());
+
+        return userDetails;
     }
+
 }

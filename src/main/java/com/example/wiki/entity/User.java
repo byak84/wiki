@@ -1,39 +1,80 @@
 package com.example.wiki.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonView;
+import lombok.*;
+import org.hibernate.Hibernate;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "usr")
-@Data
+@Getter
+@Setter
+@ToString
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @JsonView({Serialize.PostWithUser.class, Serialize.UserView.class})
     private Long id;
-    private String firstName;
-    private String lastName;
 
-    private String login;
+    @JsonView({Serialize.PostWithUser.class, Serialize.UserView.class})
+    private String firstname;
+
+    @JsonView({Serialize.PostWithUser.class, Serialize.UserView.class})
+    private String lastname;
+
+    @JsonView({Serialize.PostWithUser.class, Serialize.UserView.class})
+    private String email;
+
+    @JsonView({Serialize.PostWithUser.class, Serialize.UserView.class})
+    private String username;
+    @JsonView({Serialize.UserView.class})
     private String password;
 
-    @JsonIgnoreProperties(value = "users", allowSetters = true)
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "usr_role",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private List<Role> roles;
+    @JsonView({Serialize.UserView.class})
+    private boolean active;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @JsonView({Serialize.UserView.class})
+    private String uuid_link;
+
+
+    @JsonView({Serialize.UserView.class})
+    @ElementCollection(fetch = FetchType.EAGER, targetClass = Role.class)
+    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
+    @Enumerated(EnumType.STRING)
+    private Set<Role> roles;
+
+    @JsonView({Serialize.UserWithPosts.class})
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnoreProperties("user")
-    private List<Msg> messages;
+    @Fetch(FetchMode.SUBSELECT)
+    @ToString.Exclude
+    private List<Post> postList;
 
-    public boolean isValid() {
-        if ((this.login.equals("")) || (this.password.equals("")) ) return false;
-        else return true;
+    public User() {
+        this.active = true;
+        this.uuid_link = UUID.randomUUID().toString();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        User user = (User) o;
+
+        return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return 562048007;
+    }
 }
